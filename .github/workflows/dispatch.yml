@@ -67,5 +67,8 @@ jobs:
     needs: downmerge
     if: needs.downmerge.outputs.status == 'conflict'
     runs-on: ubuntu-latest
+    env:
+      PR: ${{ needs.downmerge.outputs.pr-number }}
     steps:
-      - run: echo "Downmerge PR #${{ needs.downmerge.outputs.pr-number }} needs hands."
+      - run: |
+          echo "Downmerge PR #$PR needs hands."
