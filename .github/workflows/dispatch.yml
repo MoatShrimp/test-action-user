@@ -41,7 +41,7 @@ jobs:
   downmerge:
     # Pin to a tag or SHA, not a branch: @main means the shared workflow can
     # change under you between runs.
-    uses: moatshrimp/github-actions/.github/workflows/downmerge.yml@v1
+    uses: MoatShrimp/github-actions/.github/workflows/downmerge.yml@v1
 
     # A reusable workflow can only narrow the caller's token, never widen it,
     # so these have to be granted here.
