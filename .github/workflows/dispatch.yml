@@ -56,6 +56,7 @@ jobs:
       dry-run: ${{ inputs.dry-run }}
       runs-on: ubuntu-latest
       reviewers: my-org/platform-team
+      auto-merge: true
 
     # Optional. Without it GITHUB_TOKEN is used, and PRs opened with that token
     # do not trigger CI on themselves.
