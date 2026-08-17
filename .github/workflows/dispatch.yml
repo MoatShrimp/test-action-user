@@ -1,0 +1,71 @@
+# Goes in the CONSUMING repo at .github/workflows/downmerge.yml
+#
+# Adds a "Run workflow" button under the Actions tab. Everything is a dropdown
+# so nobody has to remember branch names or spell "strategy" correctly.
+
+name: Downmerge
+
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: "Take commits from"
+        type: choice
+        options:
+          - main
+          - release
+        default: main
+
+      target:
+        description: "Bring up to date"
+        type: choice
+        options:
+          - dev
+          - staging
+        default: dev
+
+      strategy:
+        description: "direct = merge if allowed, PR only as fallback"
+        type: choice
+        options:
+          - direct
+          - pr
+        default: direct
+
+      dry-run:
+        description: "Report only, change nothing"
+        type: boolean
+        default: false
+
+jobs:
+  downmerge:
+    # Pin to a tag or SHA, not a branch: @main means the shared workflow can
+    # change under you between runs.
+    uses: moatshrimp/github-actions/.github/workflows/downmerge.yml@v1
+
+    # A reusable workflow can only narrow the caller's token, never widen it,
+    # so these have to be granted here.
+    permissions:
+      contents: write
+      pull-requests: write
+
+    with:
+      source: ${{ inputs.source }}
+      target: ${{ inputs.target }}
+      strategy: ${{ inputs.strategy }}
+      dry-run: ${{ inputs.dry-run }}
+      runs-on: ubuntu-latest
+      reviewers: my-org/platform-team
+
+    # Optional. Without it GITHUB_TOKEN is used, and PRs opened with that token
+    # do not trigger CI on themselves.
+    secrets:
+      token: ${{ secrets.DOWNMERGE_TOKEN }}
+
+  # Optional: react to the outcome.
+  notify:
+    needs: downmerge
+    if: needs.downmerge.outputs.status == 'conflict'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Downmerge PR #${{ needs.downmerge.outputs.pr-number }} needs hands."
